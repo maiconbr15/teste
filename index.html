@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noah Burger - Sistema Administrativo</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="Noah Burger Logo" class="logo-img">
+                <h1>Noah Burger</h1>
+            </div>
+            
+            <nav class="menu">
+                <a href="#" data-page="dashboard" class="menu-item active">
+                    <span class="icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" data-page="pedidos" class="menu-item">
+                    <span class="icon">📝</span>
+                    <span>Novo Pedido</span>
+                </a>
+                <a href="#" data-page="pedidos-list" class="menu-item">
+                    <span class="icon">📋</span>
+                    <span>Histórico de Pedidos</span>
+                </a>
+                <a href="#" data-page="caixa" class="menu-item">
+                    <span class="icon">💰</span>
+                    <span>Fechamento de Caixa</span>
+                </a>
+                <a href="#" data-page="relatorio" class="menu-item">
+                    <span class="icon">📈</span>
+                    <span>Relatório de Vendas</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h2 id="page-title">Dashboard</h2>
+                <div class="user-info">
+                    <span>Usuário: Admin</span>
+                    <button class="btn-logout">Sair</button>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Dashboard Page -->
+                <div id="dashboard" class="page active">
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <h3>Pedidos Hoje</h3>
+                            <p class="stat-number" id="stat-pedidos">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Faturamento</h3>
+                            <p class="stat-number" id="stat-faturamento">R$ 0,00</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Ticket Médio</h3>
+                            <p class="stat-number" id="stat-ticket">R$ 0,00</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Caixa Aberto</h3>
+                            <p class="stat-status" id="stat-caixa">❌ Fechado</p>
+                        </div>
+                    </div>
+
+                    <div class="charts-container">
+                        <div class="chart-box">
+                            <h3>Vendas por Categoria</h3>
+                            <canvas id="chartCategoria"></canvas>
+                        </div>
+                        <div class="chart-box">
+                            <h3>Vendas por Hora</h3>
+                            <canvas id="chartHora"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Novo Pedido Page -->
+                <div id="pedidos" class="page">
+                    <div class="form-container">
+                        <h2>Novo Pedido</h2>
+                        <form id="form-pedido">
+                            <div class="form-group">
+                                <label>Cliente (Opcional):</label>
+                                <input type="text" id="cliente" placeholder="Nome do cliente">
+                            </div>
+
+                            <div class="form-section">
+                                <h3>Itens do Pedido</h3>
+                                <div id="itens-container">
+                                    <div class="item-form">
+                                        <select class="produto-select">
+                                            <option value="">Selecione um produto</option>
+                                            <option value="burger-simples" data-preco="15.00">Burger Simples - R$ 15,00</option>
+                                            <option value="burger-duplo" data-preco="22.00">Burger Duplo - R$ 22,00</option>
+                                            <option value="burger-triplo" data-preco="29.00">Burger Triplo - R$ 29,00</option>
+                                            <option value="combo" data-preco="35.00">Combo (Burger + Bebida + Fritas) - R$ 35,00</option>
+                                            <option value="fritas" data-preco="8.00">Fritas - R$ 8,00</option>
+                                            <option value="bebida" data-preco="5.00">Bebida - R$ 5,00</option>
+                                            <option value="milkshake" data-preco="12.00">Milkshake - R$ 12,00</option>
+                                            <option value="sobremesa" data-preco="10.00">Sobremesa - R$ 10,00</option>
+                                        </select>
+                                        <input type="number" class="qtd-input" value="1" min="1">
+                                        <input type="text" class="preco-input" readonly>
+                                        <button type="button" class="btn-remover-item" style="display:none;">❌</button>
+                                    </div>
+                                </div>
+                                <button type="button" id="btn-add-item" class="btn-secondary">+ Adicionar Item</button>
+                            </div>
+
+                            <div class="form-section">
+                                <h3>Observações</h3>
+                                <textarea id="observacoes" placeholder="Ex: Sem cebola, com extra de queijo..."></textarea>
+                            </div>
+
+                            <div class="totais">
+                                <div class="total-item">
+                                    <span>Subtotal:</span>
+                                    <span id="subtotal">R$ 0,00</span>
+                                </div>
+                                <div class="total-item">
+                                    <label>Taxa/Desconto:</label>
+                                    <input type="number" id="taxa" step="0.01" value="0">
+                                </div>
+                                <div class="total-item total-final">
+                                    <span>TOTAL:</span>
+                                    <span id="total">R$ 0,00</span>
+                                </div>
+                            </div>
+
+                            <div class="button-group">
+                                <button type="button" id="btn-finalizar" class="btn-primary">Finalizar Pedido</button>
+                                <button type="button" id="btn-limpar" class="btn-secondary">Limpar Formulário</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Histórico de Pedidos -->
+                <div id="pedidos-list" class="page">
+                    <div class="pedidos-list-container">
+                        <h2>Histórico de Pedidos</h2>
+                        <div class="filtros">
+                            <input type="date" id="filter-data">
+                            <select id="filter-status">
+                                <option value="">Todos os Status</option>
+                                <option value="pendente">Pendente</option>
+                                <option value="preparando">Preparando</option>
+                                <option value="pronto">Pronto</option>
+                                <option value="entregue">Entregue</option>
+                            </select>
+                        </div>
+                        <div id="lista-pedidos" class="lista-pedidos"></div>
+                    </div>
+                </div>
+
+                <!-- Fechamento de Caixa -->
+                <div id="caixa" class="page">
+                    <div class="caixa-container">
+                        <h2>Fechamento de Caixa</h2>
+                        
+                        <div class="caixa-status">
+                            <div class="status-card" id="status-caixa">
+                                <p id="status-text">Caixa Fechado</p>
+                                <button id="btn-abrir-caixa" class="btn-primary">Abrir Caixa</button>
+                            </div>
+                        </div>
+
+                        <div id="caixa-aberto" style="display:none;">
+                            <div class="caixa-info">
+                                <h3>Informações do Caixa</h3>
+                                <p>Abertura: <strong id="hora-abertura">--:--</strong></p>
+                                <p>Vendas do Dia: <strong id="vendas-dia">R$ 0,00</strong></p>
+                                <p>Total de Pedidos: <strong id="total-pedidos">0</strong></p>
+                            </div>
+
+                            <div class="caixa-calculos">
+                                <h3>Cálculo de Fechamento</h3>
+                                <div class="calc-group">
+                                    <label>Valor em Dinheiro:</label>
+                                    <input type="number" id="valor-dinheiro" step="0.01" placeholder="0.00">
+                                </div>
+                                <div class="calc-group">
+                                    <label>Cartão de Débito:</label>
+                                    <input type="number" id="valor-debito" step="0.01" placeholder="0.00" readonly>
+                                </div>
+                                <div class="calc-group">
+                                    <label>Cartão de Crédito:</label>
+                                    <input type="number" id="valor-credito" step="0.01" placeholder="0.00" readonly>
+                                </div>
+                                <div class="calc-group">
+                                    <label>PIX:</label>
+                                    <input type="number" id="valor-pix" step="0.01" placeholder="0.00" readonly>
+                                </div>
+                            </div>
+
+                            <div class="resultado-fechamento" id="resultado-fechamento" style="display:none;">
+                                <h3>Resultado do Fechamento</h3>
+                                <p>Diferença: <strong id="diferenca">R$ 0,00</strong></p>
+                                <p id="msg-diferenca"></p>
+                            </div>
+
+                            <div class="button-group">
+                                <button id="btn-calcular-caixa" class="btn-primary">Calcular Fechamento</button>
+                                <button id="btn-finalizar-caixa" class="btn-success" style="display:none;">Finalizar Caixa</button>
+                                <button id="btn-cancelar-caixa" class="btn-secondary">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Relatório de Vendas -->
+                <div id="relatorio" class="page">
+                    <div class="relatorio-container">
+                        <h2>Relatório de Vendas</h2>
+                        <div class="relatorio-filtros">
+                            <select id="filtro-periodo">
+                                <option value="dia">Hoje</option>
+                                <option value="semana">Esta Semana</option>
+                                <option value="mes">Este Mês</option>
+                            </select>
+                        </div>
+                        <div id="relatorio-content"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para Impressão -->
+    <div id="modal-imprimir" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="conteudo-impressao"></div>
+            <button id="btn-imprimir" class="btn-primary">🖨️ Imprimir</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
